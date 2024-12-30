@@ -1,5 +1,6 @@
 // PlayerModule.ts
 
+import { PlayerClasses } from './PlayerClassModule';
 import { XPSystem } from './XPSystem';
 import { TInventoryItem } from '../types/InventoryItemType';
 import { TPlayer } from '../types/PlayerType';
@@ -9,21 +10,22 @@ export class PlayerModule {
   player: TPlayer;
   xpSystem: XPSystem;
 
-  constructor(name: string) {
+  constructor(name: string, className: string) {
+    const playerClass = PlayerClasses[className];
+    if (!playerClass) throw new Error(`Invalid class: ${className}`);
+
     this.xpSystem = new XPSystem();
     this.player = {
       name,
       level: 1,
       experience: 0,
       stats: {
-        health: 100,
-        maxHealth: 100,
-        mana: 50,
-        maxMana: 50,
-        attack: 10,
-        defense: 5,
+        ...playerClass.baseStats,
+        maxHealth: playerClass.baseStats.health,
+        maxMana: playerClass.baseStats.mana,
       },
       inventory: [],
+      playerClass,
       addItem: this.addItem.bind(this),
       removeItem: this.removeItem.bind(this),
       levelUp: this.levelUp.bind(this),
@@ -47,16 +49,19 @@ export class PlayerModule {
 
   levelUp() {
     const { stats } = this.player;
+    const { statGrowth } = this.player.playerClass
     this.player.level++;
     this.player.experience = 0;
 
     // Stat Increase on Level up
-    stats.maxHealth += 10 + this.player.level * 2;
-    stats.maxMana += 5 + this.player.level;
+    stats.maxHealth += statGrowth.health;
+    stats.maxMana += statGrowth.mana;
+    stats.attack += statGrowth.attack;
+    stats.defense += statGrowth.defense;
+
     stats.health = stats.maxHealth;
     stats.mana = stats.maxMana;
-    stats.attack += 2;
-    stats.defense += 1;
+
     console.log(`${this.player.name} leveled up to level ${this.player.level}!`);
   }
 
