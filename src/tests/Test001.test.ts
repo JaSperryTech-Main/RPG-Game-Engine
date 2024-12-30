@@ -6,7 +6,6 @@ import { TPlayer } from '../types/PlayerType';
 
 describe('Combat System', () => {
   it('should simulate a battle between player and enemy', () => {
-    // Create a player and an enemy
     const player: TPlayer = {
       name: 'Hero',
       level: 1,
@@ -20,6 +19,22 @@ describe('Combat System', () => {
         defense: 5,
       },
       inventory: [],
+      playerClass: {
+        name: 'Warrior',
+        description: 'A strong warrior',
+        baseStats: {
+          health: 100,
+          mana: 50,
+          attack: 15,
+          defense: 5,
+        },
+        statGrowth: {
+          health: 10,
+          mana: 5,
+          attack: 3,
+          defense: 2,
+        },
+      },
       addItem: () => {},
       removeItem: () => {},
       levelUp: () => {},
@@ -32,7 +47,7 @@ describe('Combat System', () => {
       level: 1,
       experience: 0,
       stats: {
-        health: 50, // Reduced health to make battle shorter
+        health: 50,
         maxHealth: 50,
         mana: 50,
         maxMana: 50,
@@ -45,20 +60,10 @@ describe('Combat System', () => {
       levelUp: () => {},
     };
 
-    // Start the battle with a maximum of 20 turns
-    const combat = new CombatSystem(player, enemy, 20);
-    const result = combat.startBattle();
+    const combat = new CombatSystem(player, enemy);
+    combat.startBattle();
 
-    // Battle should end with either player victory, enemy victory, or draw
-    expect(['player', 'enemy', 'draw']).toContain(result);
-    
-    // After battle, either player or enemy should be defeated, or it should be a draw
-    if (result === 'player') {
-      expect(enemy.stats.health).toBe(0);
-    } else if (result === 'enemy') {
-      expect(player.stats.health).toBe(0);
-    } else {
-      expect(combat.currentTurn).toBe(combat.maxTurns);
-    }
+    // After battle, either player or enemy should be defeated
+    expect(player.stats.health === 0 || enemy.stats.health === 0).toBe(true);
   });
 });

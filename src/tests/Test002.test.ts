@@ -11,7 +11,6 @@ describe('Rare Gem Drop', () => {
     let attempts = 0;
     const maxAttempts = 100;
 
-    // Create a strong player to ensure victories
     const player: TPlayer = {
       name: 'Hero',
       level: 1,
@@ -25,6 +24,22 @@ describe('Rare Gem Drop', () => {
         defense: 15,
       },
       inventory: [],
+      playerClass: {
+        name: 'Warrior',
+        description: 'A strong warrior',
+        baseStats: {
+          health: 200,
+          mana: 50,
+          attack: 30,
+          defense: 15,
+        },
+        statGrowth: {
+          health: 20,
+          mana: 5,
+          attack: 5,
+          defense: 3,
+        },
+      },
       addItem: (item: TInventoryItem) => {
         player.inventory.push(item);
         if (item.id === 'rare_gem') {
@@ -39,14 +54,11 @@ describe('Rare Gem Drop', () => {
       addExperience: () => {},
     };
 
-    // Keep fighting until we get a rare gem or reach max attempts
     while (!receivedRareGem && attempts < maxAttempts) {
       attempts++;
       
-      // Reset player health for next battle
       player.stats.health = player.stats.maxHealth;
       
-      // Create a level 6 enemy (above level 5 threshold for rare gem drops)
       const enemy: TEnemy = {
         name: 'Dragon',
         level: 6,
@@ -65,18 +77,14 @@ describe('Rare Gem Drop', () => {
         levelUp: () => {},
       };
 
-      const combat = new CombatSystem(player, enemy, 20);
-      const result = combat.startBattle();
-
-      console.log(`Battle ${attempts} result: ${result}`);
-      console.log(`Current inventory items: ${player.inventory.map(item => item.name).join(', ')}`);
+      const combat = new CombatSystem(player, enemy);
+      combat.startBattle();
     }
 
     expect(receivedRareGem).toBe(true);
     expect(attempts).toBeLessThanOrEqual(maxAttempts);
     
     const rareGems = player.inventory.filter(item => item.id === 'rare_gem');
-    console.log(`Found rare gem after ${attempts} attempts!`);
-    console.log(`Total rare gems found: ${rareGems.length}`);
+    expect(rareGems.length).toBeGreaterThan(0);
   });
 });
